@@ -1,0 +1,178 @@
+<script type="text/javascript">
+  RED.nodes.registerType("ads-eventlogger-history", {
+    category: "TwinCAT",
+    color: "#3CABDB",
+    defaults: {
+      name: { value: "" },
+      maxEvents: { value: 1000, validate: RED.validators.number() },
+      contextKey: { value: "eventlogger_history" },
+      contextStore: { value: "" },
+      passthrough: { value: false },
+    },
+    inputs: 1,
+    outputs: 1,
+    icon: "db.svg",
+    label: function () {
+      return this.name || "eventlogger history";
+    },
+    paletteLabel: "eventlogger history",
+    labelStyle: function () {
+      return this.name ? "node_label_italic" : "";
+    },
+  });
+</script>
+
+<script type="text/html" data-template-name="ads-eventlogger-history">
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name" />
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-maxEvents"
+      ><i class="fa fa-database"></i> Max Events</label
+    >
+    <input
+      type="number"
+      id="node-input-maxEvents"
+      min="1"
+      max="100000"
+      placeholder="1000"
+    />
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-contextKey"
+      ><i class="fa fa-key"></i> Context Key</label
+    >
+    <input
+      type="text"
+      id="node-input-contextKey"
+      placeholder="eventlogger_history"
+    />
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-contextStore"
+      ><i class="fa fa-archive"></i> Context Store</label
+    >
+    <input type="text" id="node-input-contextStore" placeholder="(default)" />
+    <div class="form-tips">
+      Leave blank for the default context store, or enter
+      <code>file</code> to persist across restarts (requires
+      <code>contextStorage</code> configuration in
+      <code>settings.js</code>).
+    </div>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-passthrough" style="width: auto">
+      <input
+        type="checkbox"
+        id="node-input-passthrough"
+        style="width: auto; margin: 0 8px 0 0; vertical-align: middle"
+      />
+      Pass through incoming events to output
+    </label>
+  </div>
+</script>
+
+<script type="text/html" data-help-name="ads-eventlogger-history">
+  <p>
+    Stores TwinCAT EventLogger events in Node-RED's
+    <strong>global context</strong> so they survive dashboard reloads and
+    (optionally) Node-RED restarts.
+  </p>
+
+  <h3>Inputs</h3>
+  <p>
+    This node accepts two kinds of messages on its single input:
+  </p>
+
+  <h4>1. Event messages (from <i>eventlogger subscribe</i>)</h4>
+  <p>
+    Wire the output of an <i>eventlogger subscribe</i> node into this node.
+    Incoming events are stored automatically and <strong>passed through</strong>
+    to the output.
+  </p>
+
+  <h4>2. Query / command messages</h4>
+  <dl class="message-properties">
+    <dt>payload <span class="property-type">string</span></dt>
+    <dd>
+      <ul>
+        <li><code>"getAll"</code> / <code>"getHistory"</code> – returns all stored events</li>
+        <li><code>"clear"</code> – deletes all stored events</li>
+        <li><code>"count"</code> – returns the number of stored events</li>
+      </ul>
+    </dd>
+    <dt>payload <span class="property-type">object</span></dt>
+    <dd>
+      Object with filter properties (can be combined):
+      <ul>
+        <li><code>severity</code> – minimum severity name, e.g. <code>"Warning"</code></li>
+        <li><code>severityLevel</code> – minimum severity as number (0–4)</li>
+        <li><code>sourceName</code> – substring match (case-insensitive)</li>
+        <li><code>alarmState</code> – <code>"Raised"</code> or <code>"Cleared"</code></li>
+        <li><code>eventId</code> – numeric event ID</li>
+        <li><code>eventClass</code> – event class GUID</li>
+        <li><code>since</code> – ISO date string, returns events after this timestamp</li>
+        <li><code>last</code> – return only the last N matching events</li>
+      </ul>
+    </dd>
+  </dl>
+
+  <h3>Output</h3>
+  <dl class="message-properties">
+    <dt>payload <span class="property-type">array | object</span></dt>
+    <dd>
+      For stored events: the original event is passed through unchanged.<br />
+      For queries: an array of matching event objects.
+    </dd>
+    <dt>_count <span class="property-type">number</span></dt>
+    <dd>Number of results (query responses only).</dd>
+  </dl>
+
+  <h3>Configuration</h3>
+  <dl class="message-properties">
+    <dt>Max Events</dt>
+    <dd>Maximum number of events to keep. Oldest events are discarded first. Default: 1000.</dd>
+    <dt>Context Key</dt>
+    <dd>
+      The global context key used to store the event array.
+      Default: <code>eventlogger_history</code>. Change this if you need
+      multiple independent histories.
+    </dd>
+    <dt>Context Store</dt>
+    <dd>
+      Which context store to use. Leave blank for the default (memory).
+      Set to <code>file</code> to persist across Node-RED restarts
+      (requires <code>contextStorage</code> with a <code>file</code> store
+      in <code>settings.js</code>).
+    </dd>
+  </dl>
+
+  <h3>Dashboard Integration</h3>
+  <p>
+    Because events are stored in Node-RED's global context, dashboard nodes
+    can read them directly:
+  </p>
+  <ul>
+    <li>
+      In a <b>function node</b>:
+      <code>const events = global.get("eventlogger_history") || [];</code>
+    </li>
+    <li>
+      In a <b>template node</b> with mustache:
+      <code>{{global.eventlogger_history}}</code>
+    </li>
+    <li>
+      Via the <b>Node-RED Admin API</b>:
+      <code>GET /context/global/eventlogger_history</code>
+    </li>
+  </ul>
+  <p>
+    On dashboard reload the history is instantly available — no need to wait for
+    new events.
+  </p>
+</script>

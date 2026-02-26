@@ -1,0 +1,101 @@
+<!-- ================================================================== -->
+<!-- ads-eventlogger-connection – Node-RED config node editor            -->
+<!-- ================================================================== -->
+
+<script type="text/javascript">
+  RED.nodes.registerType("ads-eventlogger-connection", {
+    category: "config",
+    defaults: {
+      name:               { value: "" },
+      targetAmsNetId:     { value: "localhost", required: true },
+      targetAdsPort:      { value: "132" },
+      routerAddress:      { value: "" },
+      routerTcpPort:      { value: "" },
+      localAmsNetId:      { value: "" },
+      localAdsPort:       { value: "" },
+      localAddress:       { value: "" },
+      localTcpPort:       { value: "" },
+      autoReconnect:      { value: true },
+      reconnectInterval:  { value: "2000" },
+      timeoutDelay:       { value: "5000" },
+    },
+    label: function () {
+      return (
+        this.name ||
+        this.targetAmsNetId + ":" + (this.targetAdsPort || "132")
+      );
+    },
+  });
+</script>
+
+<!-- ---- template ------------------------------------------------------- -->
+<script type="text/html" data-template-name="ads-eventlogger-connection">
+  <div class="form-row">
+    <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-config-input-name" placeholder="EventLogger Connection" />
+  </div>
+
+  <hr />
+  <h4>Target</h4>
+
+  <div class="form-row">
+    <label for="node-config-input-targetAmsNetId"><i class="fa fa-server"></i> Target AmsNetId</label>
+    <input type="text" id="node-config-input-targetAmsNetId"
+           placeholder="e.g. 192.168.1.1.1.1 or localhost" />
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-targetAdsPort"><i class="fa fa-plug"></i> Target ADS Port</label>
+    <input type="text" id="node-config-input-targetAdsPort" placeholder="132" />
+  </div>
+
+  <hr />
+  <h4>Router (optional)</h4>
+
+  <div class="form-row">
+    <label for="node-config-input-routerAddress"><i class="fa fa-globe"></i> Router Address</label>
+    <input type="text" id="node-config-input-routerAddress"
+           placeholder="e.g. 192.168.1.1 (empty = local router)" />
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-routerTcpPort"><i class="fa fa-plug"></i> Router TCP Port</label>
+    <input type="text" id="node-config-input-routerTcpPort" placeholder="48898 (default)" />
+  </div>
+
+  <hr />
+  <h4>Local (optional)</h4>
+
+  <div class="form-row">
+    <label for="node-config-input-localAmsNetId"><i class="fa fa-laptop"></i> Local AmsNetId</label>
+    <input type="text" id="node-config-input-localAmsNetId"
+           placeholder="(auto-assigned by router)" />
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-localAdsPort"><i class="fa fa-plug"></i> Local ADS Port</label>
+    <input type="text" id="node-config-input-localAdsPort"
+           placeholder="(auto-assigned by router)" />
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-localAddress"><i class="fa fa-laptop"></i> Local Address</label>
+    <input type="text" id="node-config-input-localAddress" placeholder="(auto)" />
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-localTcpPort"><i class="fa fa-plug"></i> Local TCP Port</label>
+    <input type="text" id="node-config-input-localTcpPort" placeholder="(auto)" />
+  </div>
+
+  <hr />
+  <h4>Connection</h4>
+
+  <div class="form-row">
+    <label for="node-config-input-autoReconnect"><i class="fa fa-refresh"></i> Auto Reconnect</label>
+    <input type="checkbox" id="node-config-input-autoReconnect" style="width: auto" />
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-reconnectInterval"><i class="fa fa-clock-o"></i> Reconnect (ms)</label>
+    <input type="text" id="node-config-input-reconnectInterval" placeholder="2000" />
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-timeoutDelay"><i class="fa fa-clock-o"></i> Timeout (ms)</label>
+    <input type="text" id="node-config-input-timeoutDelay" placeholder="5000" />
+  </div>
+</script>

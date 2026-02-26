@@ -1,0 +1,131 @@
+<!-- ================================================================== -->
+<!-- ads-eventlogger-subscribe – Node-RED editor & help                  -->
+<!-- ================================================================== -->
+
+<script type="text/javascript">
+  RED.nodes.registerType("ads-eventlogger-subscribe", {
+    category: "TwinCAT",
+    color: "#4594D1",
+    defaults: {
+      name:        { value: "" },
+      connection:  { value: "", type: "ads-eventlogger-connection", required: true },
+      minSeverity: { value: "0" },
+    },
+    inputs: 1,
+    outputs: 1,
+    icon: "font-awesome/fa-bell",
+    paletteLabel: "ADS EventLogger",
+    label: function () {
+      return this.name || "ADS EventLogger";
+    },
+  });
+</script>
+
+<!-- ---- template ------------------------------------------------------- -->
+<script type="text/html" data-template-name="ads-eventlogger-subscribe">
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="ADS EventLogger" />
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-connection"><i class="fa fa-server"></i> Connection</label>
+    <input type="text" id="node-input-connection" />
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-minSeverity"><i class="fa fa-filter"></i> Min. Severity</label>
+    <select id="node-input-minSeverity">
+      <option value="0">Verbose (all events)</option>
+      <option value="1">Info</option>
+      <option value="2">Warning</option>
+      <option value="3">Error</option>
+      <option value="4">Critical</option>
+    </select>
+  </div>
+</script>
+
+<!-- ---- help ----------------------------------------------------------- -->
+<script type="text/html" data-help-name="ads-eventlogger-subscribe">
+  <p>
+    Subscribes to TwinCAT 3 EventLogger events and alarms via the ADS protocol
+    and outputs parsed messages for each event.
+  </p>
+
+  <h3>Outputs</h3>
+  <dl class="message-properties">
+    <dt>payload <span class="property-type">object</span></dt>
+    <dd>Parsed event data (see fields below).</dd>
+
+    <dt>payload.eventClass <span class="property-type">string</span></dt>
+    <dd>Event class GUID.</dd>
+
+    <dt>payload.eventId <span class="property-type">number</span></dt>
+    <dd>Event ID within the event class.</dd>
+
+    <dt>payload.severity <span class="property-type">string</span></dt>
+    <dd>Human-readable severity: <code>Verbose</code>, <code>Info</code>,
+        <code>Warning</code>, <code>Error</code>, or <code>Critical</code>.</dd>
+
+    <dt>payload.severityLevel <span class="property-type">number</span></dt>
+    <dd>Numeric severity (0 – 4).</dd>
+
+    <dt>payload.timeRaised <span class="property-type">Date | null</span></dt>
+    <dd>Timestamp when the event was raised.</dd>
+
+    <dt>payload.timeCleared <span class="property-type">Date | null</span></dt>
+    <dd>Timestamp when the alarm was cleared (<code>null</code> for messages).</dd>
+
+    <dt>payload.timeConfirmed <span class="property-type">Date | null</span></dt>
+    <dd>Timestamp when the alarm was confirmed (<code>null</code> for messages).</dd>
+
+    <dt>payload.alarmState <span class="property-type">string | null</span></dt>
+    <dd><code>Raised</code>, <code>Cleared</code>, <code>Confirmed</code>,
+        <code>Reset</code>, or <code>null</code> for plain messages.</dd>
+
+    <dt>payload.isAlarm <span class="property-type">boolean</span></dt>
+    <dd>Whether this entry is an alarm (<code>true</code>) or a message (<code>false</code>).</dd>
+
+    <dt>payload.sourceName <span class="property-type">string</span></dt>
+    <dd>Source name of the event.</dd>
+
+    <dt>payload.message <span class="property-type">string</span></dt>
+    <dd>Event / alarm message text.</dd>
+
+    <dt>topic <span class="property-type">string</span></dt>
+    <dd>Always <code>"eventlogger"</code>.</dd>
+  </dl>
+
+  <h3>Inputs</h3>
+  <dl class="message-properties">
+    <dt>payload <span class="property-type">string</span></dt>
+    <dd>Send <code>"resubscribe"</code> to drop and re-create the subscription.</dd>
+  </dl>
+
+  <h3>Details</h3>
+  <p>
+    This node connects to the TwinCAT 3 EventLogger Publisher V2 service
+    (ADS port&nbsp;132) and subscribes to event / alarm notifications.
+  </p>
+  <p>
+    <b>Min. Severity</b> lets you suppress lower-priority events.  For example,
+    choosing <i>Warning</i> will output only Warning, Error and Critical events.
+  </p>
+  <p>Status indicator colours:</p>
+  <ul>
+    <li><b>Green dot</b> – subscribed and receiving events</li>
+    <li><b>Yellow dot</b> – subscribing in progress</li>
+    <li><b>Red ring</b> – disconnected or subscription failed</li>
+  </ul>
+
+  <h3>References</h3>
+  <ul>
+    <li>
+      <a href="https://infosys.beckhoff.com/english.php?content=../content/1033/tc3_eventlogger/index.html"
+         target="_blank">Beckhoff TwinCAT 3 EventLogger Documentation</a>
+    </li>
+    <li>
+      <a href="https://github.com/jisotalo/ads-client" target="_blank">ads-client library</a>
+    </li>
+  </ul>
+</script>

@@ -19,7 +19,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/ctanno/node-red-ads-eventlogger.git"
   },
   "files": [
     "src/",

@@ -1,11 +1,10 @@
 # Publish to npm when a GitHub Release is created.
-# Uses npm Trusted Publishing (OIDC) — no tokens or secrets needed.
 #
 # Setup (one-time):
-#   1. Go to https://www.npmjs.com/package/@ctann/node-red-ads-eventlogger/access
-#   2. Under "Trusted Publishing", click "Add new provider"
-#   3. Set: Repository owner = ctanno, Repository = node-red-ads-eventlogger
-#   4. Environment = (leave blank), Workflow = npm-publish.yml
+#   1. Create a Granular Access Token on https://www.npmjs.com/settings/ctann/tokens
+#      - Scope: @ctann/node-red-ads-eventlogger (read & write)
+#   2. Add it as a GitHub secret named NPM_TOKEN:
+#      https://github.com/ctanno/node-red-ads-eventlogger/settings/secrets/actions
 
 name: Publish to npm
 
@@ -18,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write  # Required for OIDC token exchange with npm
+      id-token: write  # Required for provenance attestation
     steps:
       - uses: actions/checkout@v4
 
@@ -30,3 +29,5 @@ jobs:
       - run: npm ci
 
       - run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

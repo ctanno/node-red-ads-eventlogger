@@ -1,5 +1,5 @@
 {
-  "name": "node-red-ads-eventlogger",
+  "name": "@ctann/node-red-ads-eventlogger",
   "version": "0.1.0",
   "description": "Node-RED nodes for subscribing to Beckhoff TwinCAT 3 EventLogger events and alarms via ADS protocol.",
   "keywords": [
@@ -26,6 +26,7 @@
     "README.md"
   ],
   "node-red": {
+    "version": ">=4.0.0",
     "nodes": {
       "ads-eventlogger-connection": "src/ads-eventlogger-connection.js",
       "ads-eventlogger-subscribe": "src/ads-eventlogger-subscribe.js",

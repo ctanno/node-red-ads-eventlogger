@@ -1,5 +1,6 @@
 # Publish to npm when a GitHub Release is created.
 # Uses npm Trusted Publishing (OIDC) — no long-lived tokens needed.
+# Requires: npm CLI >=11.5.1 and Node >=22.14.0
 # Configured on npmjs.com: ctanno/node-red-ads-eventlogger → npm-publish.yml
 
 name: Publish to npm
@@ -8,20 +9,21 @@ on:
   release:
     types: [created]
 
+permissions:
+  id-token: write   # Required for OIDC token exchange with npm
+  contents: read
+
 jobs:
   publish:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write  # Required for OIDC token exchange with npm
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           registry-url: https://registry.npmjs.org/
 
       - run: npm ci
 
-      - run: npm publish --access public --provenance
+      - run: npm publish --access public
